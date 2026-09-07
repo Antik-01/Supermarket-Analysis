@@ -13,7 +13,7 @@ import os
 
 # ── Path setup ──────────────────────────────────────────────────────────────
 THIS_DIR = Path(__file__).parent
-ROOT_DIR = THIS_DIR.parent          # workspace root where the CSV lives
+ROOT_DIR = THIS_DIR                 # workspace root where the CSV lives
 sys.path.insert(0, str(THIS_DIR))
 
 from data_loader import load_data, validate_columns, audit_data_quality, clean_data

@@ -6,6 +6,7 @@ Handles loading, validating, and cleaning the supermarket sales CSV dataset.
 import pandas as pd
 import numpy as np
 from pathlib import Path
+from typing import cast
 
 
 EXPECTED_COLUMNS = [
@@ -20,10 +21,12 @@ NUMERIC_COLUMNS = ["Unit price", "Quantity", "Tax 5%", "Sales", "cogs",
 
 
 def load_data(csv_path: str) -> pd.DataFrame:
-    """Load the CSV file and return a raw DataFrame."""
-    path = Path(csv_path)
+    base_dir = Path(__file__).resolve().parent
+    path = base_dir / csv_path
+
     if not path.exists():
-        raise FileNotFoundError(f"Dataset not found at: {csv_path}")
+        raise FileNotFoundError(f"Dataset not found at: {path}")
+
     df = pd.read_csv(path, encoding="utf-8-sig")
     df.columns = df.columns.str.strip()
     return df
@@ -94,11 +97,11 @@ def clean_data(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     filled = {}
     for col in NUMERIC_COLUMNS:
         if col in df.columns:
-            n = df[col].isna().sum()
+            n = cast(int, df[col].isna().sum())
             if n > 0:
-                median_val = df[col].median()
+                median_val = cast(float, df[col].median())
                 df[col] = df[col].fillna(median_val)
-                filled[col] = {"filled": int(n), "with_median": round(median_val, 4)}
+                filled[col] = {"filled": n, "with_median": round(median_val, 4)}
     if filled:
         log["median_filled"] = filled
 
